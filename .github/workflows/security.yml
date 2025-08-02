@@ -1,0 +1,183 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, dev, feature/* ]
+  pull_request:
+    branches: [ main, dev ]
+  schedule:
+    - cron: '0 2 * * 1'  # Каждый понедельник в 2:00 UTC
+  workflow_dispatch:
+
+jobs:
+  # Сканирование уязвимостей в коде
+  code-security:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Run Bandit (Python security scanner)
+        run: |
+          pip install bandit
+          bandit -r scripts/ -f json -o bandit-report.json || true
+
+      - name: Run Gosec (Go security scanner)
+        run: |
+          cd app-go
+          go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+          gosec ./... -fmt json -out gosec-report.json || true
+
+      - name: Run ESLint security rules
+        run: |
+          cd app-node
+          npm ci
+          npm audit --audit-level=moderate || true
+
+      - name: Run detect-secrets
+        run: |
+          pip install detect-secrets
+          detect-secrets scan --baseline .secrets.baseline || true
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            app-go/gosec-report.json
+            .secrets.baseline
+
+  # Сканирование Docker образов
+  container-security:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Go image for scanning
+        run: |
+          docker build -t app-go:scan ./app-go
+
+      - name: Build Node.js image for scanning
+        run: |
+          docker build -t app-node:scan ./app-node
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'app-go:scan'
+          format: 'sarif'
+          output: 'trivy-go-results.sarif'
+
+      - name: Run Trivy on Node.js image
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'app-node:scan'
+          format: 'sarif'
+          output: 'trivy-node-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-go-results.sarif'
+
+      - name: Upload Node.js scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-node-results.sarif'
+
+  # Проверка зависимостей
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Check Go dependencies
+        run: |
+          cd app-go
+          go list -m -u all
+
+      - name: Check Node.js dependencies
+        run: |
+          cd app-node
+          npm audit --audit-level=high
+
+      - name: Check Python dependencies
+        run: |
+          pip install safety
+          safety check --json --output safety-report.json || true
+
+      - name: Upload dependency reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-reports
+          path: safety-report.json
+
+  # Проверка конфигурации безопасности
+  security-config:
+    name: Security Configuration Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Dockerfile security
+        run: |
+          hadolint app-go/Dockerfile || true
+          hadolint app-node/Dockerfile || true
+
+      - name: Check for hardcoded secrets
+        run: |
+          python3 scripts/check_passwords.py app-go/read_products.go
+          python3 scripts/check_passwords.py app-node/create_product.js
+          python3 scripts/check_passwords.py scripts/create_app_user.py
+
+      - name: Check environment variables
+        run: |
+          if grep -r "password\|secret\|key" --include="*.go" --include="*.js" --include="*.py" . | grep -v "example\|test"; then
+            echo "Potential hardcoded secrets found"
+            exit 1
+          fi
+
+      - name: Validate security policies
+        run: |
+          echo "Checking security policy compliance..."
+          # Проверка наличия security policy
+          if [ ! -f "security/security-policy.md" ]; then
+            echo "Security policy not found"
+            exit 1
+          fi 
