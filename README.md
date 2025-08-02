@@ -1,35 +1,35 @@
-# DevOps Engineer Task - MongoDB Replica Set with Applications
+# Задача DevOps инженера - MongoDB Replica Set с приложениями
 
-This project demonstrates a complete MongoDB replica set setup with Node.js and Go applications for product management, following DevOps best practices and enterprise-grade standards.
+Этот проект демонстрирует полную настройку MongoDB replica set с приложениями Node.js и Go для управления продуктами, следуя DevOps best practices и enterprise-grade стандартам.
 
-## 📋 Table of Contents
+## 📋 Содержание
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-- [Development](#development)
-- [Security](#security)
-- [Quality Assurance](#quality-assurance)
-- [Contributing](#contributing)
+- [Обзор](#обзор)
+- [Архитектура](#архитектура)
+- [Быстрый старт](#быстрый-старт)
+- [Документация](#документация)
+- [Разработка](#разработка)
+- [Безопасность](#безопасность)
+- [Обеспечение качества](#обеспечение-качества)
+- [Участие в проекте](#участие-в-проекте)
 
-## 🚀 Overview
+## 🚀 Обзор
 
-This project implements a microservices-based architecture with MongoDB replica set for high availability and data consistency. It serves as a comprehensive example of modern DevOps practices including containerization, CI/CD, security scanning, and code quality tools.
+Этот проект реализует микросервисную архитектуру с MongoDB replica set для высокой доступности и консистентности данных. Он служит комплексным примером современных DevOps практик, включая контейнеризацию, CI/CD, сканирование безопасности и инструменты качества кода.
 
-## 🏗️ Architecture
+## 🏗️ Архитектура
 
-The project consists of:
-- **MongoDB Replica Set**: 3-node replica set with HAProxy load balancer
-- **Node.js Application**: Creates products in the database
-- **Go Application**: Reads and displays products from the database
-- **Python Scripts**: Automation for replica set initialization and user management
+Проект состоит из:
+- **MongoDB Replica Set**: 3-узловой replica set с балансировщиком нагрузки HAProxy
+- **Node.js приложение**: Создает продукты в базе данных
+- **Go приложение**: Читает и отображает продукты из базы данных
+- **Python скрипты**: Автоматизация инициализации replica set и управления пользователями
 
-For detailed architecture information, see [docs/architecture.md](docs/architecture.md).
+Для подробной информации об архитектуре см. [docs/architecture.md](docs/architecture.md).
 
-## ⚡ Quick Start
+## ⚡ Быстрый старт
 
-### Prerequisites
+### Требования
 
 - Docker Engine 20.10+
 - Docker Compose 2.0+
@@ -37,224 +37,224 @@ For detailed architecture information, see [docs/architecture.md](docs/architect
 - Node.js 16+
 - Go 1.19+
 
-### Setup Instructions
+### Инструкции по установке
 
-1. **Clone Repository**
+1. **Клонировать репозиторий**
    ```bash
    git clone <repository-url>
    cd devops-task-illiarizvash
    ```
 
-2. **Install Dependencies**
+2. **Установить зависимости**
    ```bash
-   # Python dependencies
+   # Python зависимости
    pip install -r scripts/requirements.txt
    
-   # Node.js dependencies
+   # Node.js зависимости
    cd app-node && npm install
    
-   # Go dependencies
+   # Go зависимости
    cd app-go && go mod tidy
    ```
 
-3. **Start Infrastructure**
+3. **Запустить инфраструктуру**
    ```bash
    cd mongo
    docker-compose up -d
    ```
 
-4. **Initialize Database**
+4. **Инициализировать базу данных**
    ```bash
    cd scripts
    python init_mongo_servers.py
    python create_app_user.py
    ```
 
-5. **Test Applications**
+5. **Протестировать приложения**
    ```bash
-   # Create products
+   # Создать продукты
    cd app-node
    node create_product.js
    
-   # Read products
+   # Читать продукты
    cd app-go
    go run read_products.go
    ```
 
-For detailed deployment instructions, see [docs/deployment.md](docs/deployment.md).
+Для подробных инструкций по развертыванию см. [docs/deployment.md](docs/deployment.md).
 
-## 📚 Documentation
+## 📚 Документация
 
-### Core Documentation
-- [**Architecture**](docs/architecture.md) - System architecture and component interactions
-- [**Deployment Guide**](docs/deployment.md) - Detailed deployment instructions for different environments
-- [**Architecture Decision Records**](docs/decisions.md) - Technical decisions and rationale
+### Основная документация
+- [**Архитектура**](docs/architecture.md) - Архитектура системы и взаимодействие компонентов
+- [**Руководство по развертыванию**](docs/deployment.md) - Подробные инструкции по развертыванию для разных сред
+- [**Записи архитектурных решений**](docs/decisions.md) - Технические решения и обоснования
 
-### Development
-- [**Code Quality Tools**](code-quality/) - Linters, formatters, and quality checkers
-- [**Pre-commit Hooks**](demo_pre_commit_hooks/) - Git hooks for automated quality checks
-- [**Security Policy**](security/security-policy.md) - Security guidelines and procedures
+### Разработка
+- [**Инструменты качества кода**](code-quality/) - Линтеры, форматтеры и проверки качества
+- [**Pre-commit хуки**](demo_pre_commit_hooks/) - Git хуки для автоматических проверок качества
+- [**Политика безопасности**](security/security-policy.md) - Руководства и процедуры безопасности
 
 ### CI/CD
-- [**GitHub Actions**](.github/workflows/) - Automated testing, building, and deployment
-- [**Docker Best Practices**](app-go/Dockerfile) - Optimized container configurations
+- [**GitHub Actions**](.github/workflows/) - Автоматизированное тестирование, сборка и развертывание
+- [**Docker Best Practices**](app-go/Dockerfile) - Оптимизированные конфигурации контейнеров
 
-## 🔧 Development
+## 🔧 Разработка
 
-### Code Quality
+### Качество кода
 
-The project includes comprehensive code quality tools:
+Проект включает комплексные инструменты качества кода:
 
 - **Python**: Black, isort, flake8, mypy, bandit
 - **Go**: golangci-lint, gofmt, govet
-- **JavaScript**: ESLint with security plugins
-- **Docker**: Hadolint for Dockerfile validation
+- **JavaScript**: ESLint с плагинами безопасности
+- **Docker**: Hadolint для валидации Dockerfile
 
-### Pre-commit Hooks
+### Pre-commit хуки
 
-Install and configure pre-commit hooks for automated quality checks:
+Установите и настройте pre-commit хуки для автоматических проверок качества:
 
 ```bash
-# Install pre-commit
+# Установить pre-commit
 pip install pre-commit
 
-# Install hooks
+# Установить хуки
 pre-commit install
 
-# Run manually
+# Запустить вручную
 pre-commit run --all-files
 ```
 
-For detailed configuration, see [demo_pre_commit_hooks/](demo_pre_commit_hooks/).
+Для подробной конфигурации см. [demo_pre_commit_hooks/](demo_pre_commit_hooks/).
 
-### Testing
+### Тестирование
 
 ```bash
-# Python tests
+# Python тесты
 python -m pytest tests/
 
-# Go tests
+# Go тесты
 cd app-go && go test ./...
 
-# Node.js tests
+# Node.js тесты
 cd app-node && npm test
 ```
 
-## 🔒 Security
+## 🔒 Безопасность
 
-### Security Features
+### Функции безопасности
 
-- **Vulnerability Scanning**: Automated scanning with Trivy and Bandit
-- **Secret Detection**: Pre-commit hooks to prevent secret leaks
-- **Container Security**: Non-root users and minimal base images
-- **Network Security**: Isolated Docker networks and firewall rules
+- **Сканирование уязвимостей**: Автоматизированное сканирование с Trivy и Bandit
+- **Обнаружение секретов**: Pre-commit хуки для предотвращения утечек секретов
+- **Безопасность контейнеров**: Не-root пользователи и минимальные базовые образы
+- **Сетевая безопасность**: Изолированные Docker сети и правила файрвола
 
-### Security Tools
+### Инструменты безопасности
 
-- **Static Analysis**: Bandit, ESLint security, gosec
-- **Container Scanning**: Trivy, Hadolint
-- **Secret Management**: detect-secrets pre-commit hook
+- **Статический анализ**: Bandit, ESLint security, gosec
+- **Сканирование контейнеров**: Trivy, Hadolint
+- **Управление секретами**: detect-secrets pre-commit хук
 
-For detailed security policies, see [security/](security/).
+Для подробных политик безопасности см. [security/](security/).
 
-## 🎯 Quality Assurance
+## 🎯 Обеспечение качества
 
-### Automated Checks
+### Автоматические проверки
 
-The project includes comprehensive quality assurance:
+Проект включает комплексное обеспечение качества:
 
-- **Code Formatting**: Automated formatting with Black, gofmt, ESLint
-- **Static Analysis**: Type checking, linting, security scanning
-- **Testing**: Unit tests, integration tests, security tests
-- **Documentation**: Automated documentation generation and validation
+- **Форматирование кода**: Автоматическое форматирование с Black, gofmt, ESLint
+- **Статический анализ**: Проверка типов, линтинг, сканирование безопасности
+- **Тестирование**: Unit тесты, интеграционные тесты, тесты безопасности
+- **Документация**: Автоматическая генерация и валидация документации
 
-### Quality Metrics
+### Метрики качества
 
-- **Code Coverage**: Automated test coverage reporting
-- **Security Score**: Vulnerability scanning and scoring
-- **Performance**: Automated performance testing
-- **Compliance**: Automated compliance checking
+- **Покрытие кода**: Автоматическая отчетность о покрытии тестами
+- **Оценка безопасности**: Сканирование уязвимостей и оценка
+- **Производительность**: Автоматическое тестирование производительности
+- **Соответствие**: Автоматическая проверка соответствия
 
-## 🤝 Contributing
+## 🤝 Участие в проекте
 
-### Development Workflow
+### Рабочий процесс разработки
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes** following the coding standards
-4. **Run quality checks**: `pre-commit run --all-files`
-5. **Write tests** for new functionality
-6. **Update documentation** as needed
-7. **Submit a pull request**
+1. **Форкните репозиторий**
+2. **Создайте ветку для функции**: `git checkout -b feature/amazing-feature`
+3. **Внесите изменения** следуя стандартам кодирования
+4. **Запустите проверки качества**: `pre-commit run --all-files`
+5. **Напишите тесты** для новой функциональности
+6. **Обновите документацию** при необходимости
+7. **Отправьте pull request**
 
-### Code Standards
+### Стандарты кода
 
-- Follow the established code formatting rules
-- Write comprehensive tests
-- Update documentation for any changes
-- Follow security best practices
-- Use conventional commit messages
+- Следуйте установленным правилам форматирования кода
+- Пишите комплексные тесты
+- Обновляйте документацию для любых изменений
+- Следуйте best practices безопасности
+- Используйте conventional commit сообщения
 
-### Quality Gates
+### Ворота качества
 
-All contributions must pass:
-- ✅ Code formatting checks
-- ✅ Static analysis
-- ✅ Security scanning
-- ✅ Unit tests
-- ✅ Integration tests
-- ✅ Documentation validation
+Все вклады должны пройти:
+- ✅ Проверки форматирования кода
+- ✅ Статический анализ
+- ✅ Сканирование безопасности
+- ✅ Unit тесты
+- ✅ Интеграционные тесты
+- ✅ Валидацию документации
 
-## 📊 Monitoring
+## 📊 Мониторинг
 
-### Health Checks
+### Проверки здоровья
 
 ```bash
-# Check replica set status
+# Проверить статус replica set
 python scripts/check_replicaset_status.py
 
-# Check application logs
+# Проверить логи приложений
 docker logs product-creator
 docker logs product-reader
 
-# Monitor HAProxy
+# Мониторить HAProxy
 docker logs haproxy-lb
 ```
 
-### Metrics
+### Метрики
 
-- **Database**: Replica set status, connection health
-- **Applications**: Response times, error rates
-- **Infrastructure**: Container health, resource usage
+- **База данных**: Статус replica set, здоровье соединений
+- **Приложения**: Время отклика, частота ошибок
+- **Инфраструктура**: Здоровье контейнеров, использование ресурсов
 
-## 🚨 Troubleshooting
+## 🚨 Устранение неполадок
 
-### Common Issues
+### Частые проблемы
 
-1. **Replica Set Not Initialized**
+1. **Replica Set не инициализирован**
    ```bash
    python scripts/init_mongo_servers.py
    ```
 
-2. **Connection Refused**
-   - Check if containers are running: `docker ps`
-   - Verify port mappings
-   - Check firewall settings
+2. **Соединение отклонено**
+   - Проверьте, запущены ли контейнеры: `docker ps`
+   - Проверьте маппинг портов
+   - Проверьте настройки файрвола
 
-3. **Authentication Failed**
-   - Verify user credentials
-   - Check keyfile permissions
-   - Ensure proper replica set configuration
+3. **Аутентификация не удалась**
+   - Проверьте учетные данные пользователя
+   - Проверьте права доступа к keyfile
+   - Убедитесь в правильной конфигурации replica set
 
-For more troubleshooting information, see [docs/deployment.md](docs/deployment.md).
+Для дополнительной информации по устранению неполадок см. [docs/deployment.md](docs/deployment.md).
 
-## 📄 License
+## 📄 Лицензия
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для подробностей.
 
-## 🙏 Acknowledgments
+## 🙏 Благодарности
 
-- MongoDB for the excellent database technology
-- Docker for containerization platform
-- HAProxy for load balancing
-- All open-source contributors to the tools used in this project
+- MongoDB за отличную технологию базы данных
+- Docker за платформу контейнеризации
+- HAProxy за балансировку нагрузки
+- Все open-source контрибьюторы инструментов, используемых в этом проекте

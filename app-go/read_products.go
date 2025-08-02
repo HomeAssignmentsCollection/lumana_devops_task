@@ -18,10 +18,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// Global logger variable
+// Глобальная переменная логгера
 var logger *zap.Logger
 
-// safeLog safely logs messages if logger is initialized
+// safeLog безопасно логирует сообщения если логгер инициализирован
 func safeLog(level string, msg string, fields ...zap.Field) {
 	if logger != nil {
 		switch level {
@@ -37,7 +37,7 @@ func safeLog(level string, msg string, fields ...zap.Field) {
 	}
 }
 
-// Rate limiter structure
+// Структура ограничителя скорости
 type RateLimiter struct {
 	requests map[string][]time.Time
 	mutex    sync.RWMutex
@@ -45,7 +45,7 @@ type RateLimiter struct {
 	maxReqs  int
 }
 
-// NewRateLimiter creates a new rate limiter
+// NewRateLimiter создает новый ограничитель скорости
 func NewRateLimiter(window time.Duration, maxReqs int) *RateLimiter {
 	return &RateLimiter{
 		requests: make(map[string][]time.Time),
@@ -54,7 +54,7 @@ func NewRateLimiter(window time.Duration, maxReqs int) *RateLimiter {
 	}
 }
 
-// IsAllowed checks if request is allowed
+// IsAllowed проверяет разрешен ли запрос
 func (rl *RateLimiter) IsAllowed(ip string) bool {
 	rl.mutex.Lock()
 	defer rl.mutex.Unlock()
@@ -62,7 +62,7 @@ func (rl *RateLimiter) IsAllowed(ip string) bool {
 	now := time.Now()
 	windowStart := now.Add(-rl.window)
 
-	// Clean old requests
+	// Очистить старые запросы
 	if times, exists := rl.requests[ip]; exists {
 		var validTimes []time.Time
 		for _, t := range times {
@@ -73,17 +73,17 @@ func (rl *RateLimiter) IsAllowed(ip string) bool {
 		rl.requests[ip] = validTimes
 	}
 
-	// Check if limit exceeded
+	// Проверить превышен ли лимит
 	if len(rl.requests[ip]) >= rl.maxReqs {
 		return false
 	}
 
-	// Add current request
+	// Добавить текущий запрос
 	rl.requests[ip] = append(rl.requests[ip], now)
 	return true
 }
 
-// getMongoURI constructs MongoDB connection URI from environment variables
+// getMongoURI конструирует URI подключения к MongoDB из переменных окружения
 func getMongoURI() string {
 	user := os.Getenv("MONGO_USER")
 	password := os.Getenv("MONGO_PASSWORD")
@@ -93,7 +93,7 @@ func getMongoURI() string {
 	replicaSet := os.Getenv("MONGO_REPLICA_SET")
 
 	if host == "" {
-		host = "mongo-0"  // Use primary node
+		host = "mongo-0"  // Использовать первичный узел
 	}
 	if port == "" {
 		port = "27017"

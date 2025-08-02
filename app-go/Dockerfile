@@ -1,65 +1,65 @@
 # syntax=docker/dockerfile:1
 
-# Multi-stage build for optimized production image
-# Stage 1: Build stage
+# Многоэтапная сборка для оптимизированного продакшн образа
+# Этап 1: Этап сборки
 FROM golang:1.21-alpine AS build
 
-# Set working directory
+# Установить рабочую директорию
 WORKDIR /app
 
-# Install build dependencies
+# Установить зависимости для сборки
 RUN apk add --no-cache git ca-certificates tzdata
 
-# Copy go mod files first for better layer caching
+# Скопировать файлы go mod сначала для лучшего кэширования слоев
 COPY go.mod go.sum ./
 
-# Download dependencies (cached layer)
+# Скачать зависимости (кэшированный слой)
 RUN go mod download
 
-# Copy source code
+# Скопировать исходный код
 COPY . .
 
-# Build the application with optimizations
-# - CGO_ENABLED=0: Static linking for smaller image
-# - GOOS=linux: Target Linux platform
-# - -ldflags: Strip debug info and optimize binary size
+# Собрать приложение с оптимизациями
+# - CGO_ENABLED=0: Статическая линковка для меньшего образа
+# - GOOS=linux: Целевая платформа Linux
+# - -ldflags: Убрать отладочную информацию и оптимизировать размер бинарного файла
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-w -s" \
     -a -installsuffix cgo \
     -o read_products read_products.go
 
-# Stage 2: Production stage
-# Use minimal alpine image for security and size
+# Этап 2: Продакшн этап
+# Использовать минимальный alpine образ для безопасности и размера
 FROM alpine:latest
 
-# Install runtime dependencies
+# Установить зависимости для выполнения
 RUN apk --no-cache add ca-certificates tzdata
 
-# Create non-root user for security
+# Создать не-root пользователя для безопасности
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
-# Set working directory
+# Установить рабочую директорию
 WORKDIR /app
 
-# Copy binary from build stage
+# Скопировать бинарный файл из этапа сборки
 COPY --from=build /app/read_products .
 
-# Change ownership to non-root user
+# Изменить владельца на не-root пользователя
 RUN chown -R appuser:appgroup /app
 
-# Switch to non-root user
+# Переключиться на не-root пользователя
 USER appuser
 
-# Expose port (if needed for health checks)
+# Открыть порт (если нужен для проверок здоровья)
 EXPOSE 8080
 
-# Health check to ensure application is running
+# Проверка здоровья для обеспечения работы приложения
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD ps aux | grep read_products || exit 1
 
-# Set environment variables
+# Установить переменные окружения
 ENV GIN_MODE=release
 
-# Run the application
+# Запустить приложение
 CMD ["./read_products"]

@@ -1,51 +1,51 @@
-# Multi-stage build for optimized production image
-# Stage 1: Build stage
+# Многоэтапная сборка для оптимизированного продакшн образа
+# Этап 1: Этап сборки
 FROM node:18-alpine AS build
 
-# Set working directory
+# Установить рабочую директорию
 WORKDIR /app
 
-# Copy package files first for better layer caching
+# Скопировать файлы пакета сначала для лучшего кэширования слоев
 COPY package*.json ./
 
-# Install dependencies
+# Установить зависимости
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy source code
+# Скопировать исходный код
 COPY . .
 
-# Stage 2: Production stage
+# Этап 2: Продакшн этап
 FROM node:18-alpine AS production
 
-# Install runtime dependencies
+# Установить зависимости для выполнения
 RUN apk --no-cache add dumb-init
 
-# Create non-root user for security
+# Создать не-root пользователя для безопасности
 RUN addgroup -g 1001 -S nodejs && \
     adduser -u 1001 -S nodejs -G nodejs
 
-# Set working directory
+# Установить рабочую директорию
 WORKDIR /app
 
-# Copy node_modules and source from build stage
+# Скопировать node_modules и исходный код из этапа сборки
 COPY --from=build --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=nodejs:nodejs /app/create_product.js ./
 
-# Switch to non-root user
+# Переключиться на не-root пользователя
 USER nodejs
 
-# Expose port (if needed for health checks)
+# Открыть порт (если нужен для проверок здоровья)
 EXPOSE 3000
 
-# Health check to ensure application is running
+# Проверка здоровья для обеспечения работы приложения
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD node -e "console.log('Health check passed')" || exit 1
 
-# Set environment variables
+# Установить переменные окружения
 ENV NODE_ENV=production
 
-# Use dumb-init to handle signals properly
+# Использовать dumb-init для правильной обработки сигналов
 ENTRYPOINT ["dumb-init", "--"]
 
-# Run the application
+# Запустить приложение
 CMD ["node", "create_product.js"] 

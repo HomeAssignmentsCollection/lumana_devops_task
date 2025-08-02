@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-MongoDB Application User Creator
-This script creates application users in MongoDB for development.
+Создатель пользователей приложения MongoDB
+Этот скрипт создает пользователей приложения в MongoDB для разработки.
 """
 import os
 import sys
 
 import pymongo
 
-# MongoDB connection parameters from environment variables
+# Параметры подключения к MongoDB из переменных окружения
 MONGO_HOST = os.getenv("MONGO_HOST", "127.0.0.1")
 MONGO_PORT = int(os.getenv("MONGO_PORT", "27031"))
 ADMIN_USER = os.getenv("MONGO_ADMIN_USER", "mongo-1")
@@ -17,7 +17,7 @@ if not ADMIN_PASS:
     print("ERROR: MONGO_ADMIN_PASSWORD environment variable must be set")
     sys.exit(1)
 
-# Application database and user configuration from environment variables
+# Конфигурация базы данных приложения и пользователя из переменных окружения
 APP_DB = os.getenv("MONGO_DB", "appdb")
 APP_USER = os.getenv("APP_DB_USER", "appuser")
 APP_PASS = os.getenv("APP_DB_PASSWORD")
@@ -27,8 +27,8 @@ if not APP_PASS:
 
 
 def create_app_user():
-    """Create application user with read/write permissions on appdb database"""
-    # Connect to MongoDB using admin credentials
+    """Создает пользователя приложения с правами чтения/записи на базе данных appdb"""
+    # Подключение к MongoDB используя учетные данные администратора
     uri = (
         f"mongodb://{ADMIN_USER}:{ADMIN_PASS}@{MONGO_HOST}:{MONGO_PORT}"
         "/admin?directConnection=true&authSource=admin"
@@ -37,7 +37,7 @@ def create_app_user():
     db = client[APP_DB]
 
     try:
-        # Create user with readWrite role on the application database
+        # Создать пользователя с ролью readWrite на базе данных приложения
         db.command(
             "createUser",
             APP_USER,

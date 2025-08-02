@@ -4,11 +4,11 @@ const winston = require('winston');
 const rateLimit = require('express-rate-limit');
 const prometheus = require('prom-client');
 
-// Initialize Prometheus metrics
+// Инициализация метрик Prometheus
 const register = new prometheus.Registry();
 prometheus.collectDefaultMetrics({ register });
 
-// Custom metrics
+// Пользовательские метрики
 const httpRequestDurationMicroseconds = new prometheus.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
@@ -33,13 +33,13 @@ const mongoOperations = new prometheus.Counter({
   labelNames: ['operation', 'status']
 });
 
-// Register metrics
+// Регистрация метрик
 register.registerMetric(httpRequestDurationMicroseconds);
 register.registerMetric(httpRequestsTotal);
 register.registerMetric(productsCreated);
 register.registerMetric(mongoOperations);
 
-// Configure structured logging
+// Настройка структурированного логирования
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(
@@ -62,10 +62,10 @@ const logger = winston.createLogger({
   ]
 });
 
-// Configure rate limiting
+// Настройка ограничения скорости
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 100, // ограничить каждый IP до 100 запросов за windowMs
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: '15 minutes'
@@ -74,14 +74,14 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// getMongoURI constructs MongoDB connection URI from environment variables
+// getMongoURI конструирует URI подключения к MongoDB из переменных окружения
 function getMongoURI() {
   const host = process.env.MONGO_HOST || 'mongo-1';
   const port = process.env.MONGO_PORT || '27017';
   const db = process.env.MONGO_DB || 'appdb';
   const directConnection = process.env.MONGO_DIRECT_CONNECTION || 'true';
 
-  // Connect without authentication for development
+  // Подключение без аутентификации для разработки
   const uri = `mongodb://${host}:${port}/${db}?directConnection=${directConnection}`;
   
   logger.info('MongoDB URI constructed', {
@@ -94,10 +94,10 @@ function getMongoURI() {
   return uri;
 }
 
-// MongoDB connection URI for direct connection to replica set member
+// URI подключения к MongoDB для прямого подключения к члену replica set
 const uri = getMongoURI();
 
-// Create Express app for health checks
+// Создание Express приложения для проверок здоровья
 const app = express();
 const PORT = process.env.PORT || 3000;
 
