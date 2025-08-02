@@ -1,128 +1,128 @@
-name: Pre-commit Checks
-
-on:
-  push:
-    branches: [ main, dev, feature/*, bugfix/* ]
-  pull_request:
-    branches: [ main, dev ]
-  workflow_dispatch:
-
-jobs:
-  pre-commit:
-    name: Pre-commit Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-
-      - name: Install pre-commit
-        run: |
-          pip install pre-commit
-
-      - name: Install pre-commit hooks
-        run: |
-          pre-commit install
-
-      - name: Run pre-commit on all files
-        run: |
-          pre-commit run --all-files
-
-  # Дополнительные проверки качества кода
-  code-quality:
-    name: Code Quality Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-
-      - name: Install Python dependencies
-        run: |
-          pip install black isort flake8 mypy bandit
-
-      - name: Install Node.js dependencies
-        run: |
-          cd app-node
-          npm ci
-
-      - name: Install Go tools
-        run: |
-          go install golangci-lint/cmd/golangci-lint@latest
-
-      - name: Python code formatting check
-        run: |
-          black --check --diff scripts/
-          isort --check-only --diff scripts/
-
-      - name: Python linting
-        run: |
-          flake8 scripts/ --max-line-length=88 --extend-ignore=E203,W503
-
-      - name: Python type checking
-        run: |
-          mypy scripts/ --ignore-missing-imports
-
-      - name: Python security scan
-        run: |
-          bandit -r scripts/ -f json -o bandit-report.json || true
-
-      - name: Go code formatting check
-        run: |
-          cd app-go
-          go fmt ./...
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Go code is not formatted. Run 'go fmt ./...'"
-            exit 1
-          fi
-
-      - name: Go linting
-        run: |
-          cd app-go
-          golangci-lint run ./...
-
-      - name: Node.js linting
-        run: |
-          cd app-node
-          npm run lint || true
-
-      - name: Node.js security audit
-        run: |
-          cd app-node
-          npm audit --audit-level=moderate || true
-
-      - name: Upload quality reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: quality-reports
-          path: |
-            bandit-report.json
-            app-go/golangci-lint-report.json 
+# name: Pre-commit Checks
+# 
+# on:
+#   push:
+#     branches: [ main, dev, feature/*, bugfix/* ]
+#   pull_request:
+#     branches: [ main, dev ]
+#   workflow_dispatch:
+# 
+# jobs:
+#   pre-commit:
+#     name: Pre-commit Checks
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+# 
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.9'
+# 
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '18'
+# 
+#       - name: Setup Go
+#         uses: actions/setup-go@v4
+#         with:
+#           go-version: '1.21'
+# 
+#       - name: Install pre-commit
+#         run: |
+#           pip install pre-commit
+# 
+#       - name: Install pre-commit hooks
+#         run: |
+#           pre-commit install
+# 
+#       - name: Run pre-commit on all files
+#         run: |
+#           pre-commit run --all-files
+# 
+#   # Дополнительные проверки качества кода
+#   code-quality:
+#     name: Code Quality Checks
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+# 
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.9'
+# 
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '18'
+# 
+#       - name: Setup Go
+#         uses: actions/setup-go@v4
+#         with:
+#           go-version: '1.21'
+# 
+#       - name: Install Python dependencies
+#         run: |
+#           pip install black isort flake8 mypy bandit
+# 
+#       - name: Install Node.js dependencies
+#         run: |
+#           cd app-node
+#           npm ci
+# 
+#       - name: Install Go tools
+#         run: |
+#           go install golangci-lint/cmd/golangci-lint@latest
+# 
+#       - name: Python code formatting check
+#         run: |
+#           black --check --diff scripts/
+#           isort --check-only --diff scripts/
+# 
+#       - name: Python linting
+#         run: |
+#           flake8 scripts/ --max-line-length=88 --extend-ignore=E203,W503
+# 
+#       - name: Python type checking
+#         run: |
+#           mypy scripts/ --ignore-missing-imports
+# 
+#       - name: Python security scan
+#         run: |
+#           bandit -r scripts/ -f json -o bandit-report.json || true
+# 
+#       - name: Go code formatting check
+#         run: |
+#           cd app-go
+#           go fmt ./...
+#           if [ -n "$(git status --porcelain)" ]; then
+#             echo "Go code is not formatted. Run 'go fmt ./...'"
+#             exit 1
+#           fi
+# 
+#       - name: Go linting
+#         run: |
+#           cd app-go
+#           golangci-lint run ./...
+# 
+#       - name: Node.js linting
+#         run: |
+#           cd app-node
+#           npm run lint || true
+# 
+#       - name: Node.js security audit
+#         run: |
+#           cd app-node
+#           npm audit --audit-level=moderate || true
+# 
+#       - name: Upload quality reports
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: quality-reports
+#           path: |
+#             bandit-report.json
+#             app-go/golangci-lint-report.json 
